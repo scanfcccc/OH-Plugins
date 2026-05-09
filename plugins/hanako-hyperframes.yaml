@@ -1,0 +1,42 @@
+schemaVersion: 1
+id: hanako-hyperframes
+name: HyperFrames Adapter for Hanako
+publisher: OpenHanako
+author: liliMozi
+version: 0.2.0
+description: Embed and Hana-theme the original HyperFrames Studio with project lifecycle, lint, and render tools.
+license: Apache-2.0
+categories:
+  - Design
+  - Video
+keywords:
+  - hyperframes
+  - video
+  - html
+  - timeline
+  - render
+homepage: https://github.com/liliMozi/OH-Plugins
+repository: https://github.com/liliMozi/OH-Plugins
+readmePath: official-plugins/hanako-hyperframes/README.md
+source:
+  kind: official-source
+  path: official-plugins/hanako-hyperframes
+compatibility:
+  minAppVersion: 0.171.3
+trust: full-access
+permissions:
+  - Runs local HyperFrames CLI subprocesses
+  - Reads and writes plugin-owned video project files
+  - Stages rendered video files into Hanako sessions
+contributions:
+  - tools
+  - configuration
+  - routes
+  - page
+  - lifecycle
+distribution:
+  kind: release
+  packageUrl: https://github.com/liliMozi/OH-Plugins/releases/download/hanako-hyperframes-v0.2.0/hanako-hyperframes.zip
+  sha256: 51e386f4f46b5e6d6adc390eab3fda6aa78cce0a245ce4844440a761158b71f8
+install:
+  defaultEnabled: false

@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
+import yaml from "js-yaml";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PLUGINS_DIR = path.join(ROOT, "plugins");
@@ -24,6 +25,12 @@ async function exists(filePath) {
 
 async function readJson(filePath) {
   return JSON.parse(await fs.readFile(filePath, "utf8"));
+}
+
+async function readEntry(filePath) {
+  const text = await fs.readFile(filePath, "utf8");
+  if (filePath.endsWith(".json")) return JSON.parse(text);
+  return yaml.load(text);
 }
 
 function isHttpsUrl(value) {
@@ -100,27 +107,29 @@ async function validateEntry(entry, fileName, seenIds) {
   if (entry.distribution.kind === "source") {
     const pluginPath = assertRepoRelativePath(entry.distribution.path, `${entry.id}: source distribution path`);
     assert(await exists(pluginPath), `${entry.id}: source distribution path does not exist`);
-
-    if (entry.source?.kind === "official-source") {
-      await validateOfficialPlugin(entry, pluginPath);
-    }
   } else if (entry.distribution.kind === "release") {
     assert(isHttpsUrl(entry.distribution.packageUrl), `${entry.id}: release packageUrl must be https`);
     assert(SHA256_RE.test(entry.distribution.sha256), `${entry.id}: release sha256 must be 64 lowercase hex chars`);
   } else {
     throw new Error(`${entry.id}: distribution.kind must be source or release`);
   }
+
+  if (entry.source?.kind === "official-source") {
+    const pluginPath = assertRepoRelativePath(entry.source.path, `${entry.id}: official source path`);
+    assert(await exists(pluginPath), `${entry.id}: official source path does not exist`);
+    await validateOfficialPlugin(entry, pluginPath);
+  }
 }
 
 async function main() {
   const files = (await fs.readdir(PLUGINS_DIR))
-    .filter((file) => file.endsWith(".json"))
+    .filter((file) => /\.(json|ya?ml)$/.test(file))
     .sort((a, b) => a.localeCompare(b));
 
   const entries = [];
   const seenIds = new Set();
   for (const file of files) {
-    const entry = await readJson(path.join(PLUGINS_DIR, file));
+    const entry = await readEntry(path.join(PLUGINS_DIR, file));
     await validateEntry(entry, file, seenIds);
     entries.push(entry);
   }
@@ -128,11 +137,11 @@ async function main() {
   const marketplace = await readJson(MARKETPLACE_FILE);
   assert(marketplace.schemaVersion === 1, "marketplace.json: schemaVersion must be 1");
   assert(Array.isArray(marketplace.plugins), "marketplace.json: plugins must be an array");
-  assert(marketplace.plugins.length === entries.length, "marketplace.json: plugin count does not match plugins/*.json");
+  assert(marketplace.plugins.length === entries.length, "marketplace.json: plugin count does not match plugins/*.{json,yaml,yml}");
 
   const entryIds = entries.map((entry) => entry.id).sort();
   const marketIds = marketplace.plugins.map((entry) => entry.id).sort();
-  assert(JSON.stringify(entryIds) === JSON.stringify(marketIds), "marketplace.json: plugin ids do not match plugins/*.json");
+  assert(JSON.stringify(entryIds) === JSON.stringify(marketIds), "marketplace.json: plugin ids do not match plugins/*.{json,yaml,yml}");
 
   console.log(`Validated ${entries.length} marketplace entries.`);
 }

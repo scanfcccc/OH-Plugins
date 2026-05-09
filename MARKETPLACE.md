@@ -9,7 +9,7 @@ when loading.
 
 ## Entry Requirements
 
-Every `plugins/*.json` entry must declare:
+Every `plugins/*.{yaml,yml,json}` entry must declare:
 
 - `id`, `name`, `publisher`, `version`, `description`
 - `repository`
@@ -42,27 +42,16 @@ Permission upgrades require fresh user confirmation.
 Hana's marketplace detail page reads README content in this order:
 
 1. `readme` for short inline Markdown.
-2. `readmePath` for Markdown files stored in this repository.
+2. `readmePath` for Markdown files stored in this repository. Hana resolves it
+   relative to the marketplace URL when the official catalog is loaded remotely.
 3. `readmeUrl` for external HTTPS Markdown.
-
-Use `readmePath` only when Hana reads the marketplace from a local file. For a
-GitHub raw URL marketplace, use inline `readme` or an HTTPS `readmeUrl`.
 
 ## Current Install Behavior
 
-Hana can browse marketplace indexes from either a local file or an HTTPS URL.
-Install behavior differs by source:
+Hana clients read this repository's generated `marketplace.json` by default and
+install `distribution.kind = "release"` entries by downloading the zip package,
+verifying `sha256`, and unpacking it into the user's plugin directory.
 
-- Local file marketplace + `distribution.kind = "source"`: installable, because
-  the source path can resolve to a local directory.
-- URL marketplace + `distribution.kind = "source"`: browsable only, because a
-  path inside a remote repository is not a local installable path.
-- `distribution.kind = "release"`: catalog contract is defined here, but Hana
-  still needs remote package download, sha256 verification, and permission
-  confirmation before one-click install is enabled.
-
-## Custom Registries
-
-Hana can later allow users to add additional registry URLs. A custom registry
-must serve the same `marketplace.json` shape and should be treated as a separate
-trust source.
+Local file marketplaces remain a developer override. They can install
+`distribution.kind = "source"` entries because paths resolve on disk. Users do
+not manage marketplace sources in the product UI.

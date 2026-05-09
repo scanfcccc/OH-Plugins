@@ -1,37 +1,39 @@
 # OH-Plugins
 
-This repository is the public index for OpenHanako plugins. It may also host
-official plugin source directories when a plugin is ready to be maintained as
-part of the official catalog.
+This repository is the official OpenHanako community plugin catalog. It follows
+the Obsidian-style model: third-party authors submit plugin metadata to one
+official catalog, and Hana clients read the generated catalog without asking
+users to manage marketplace sources.
 
 ## Repository Layout
 
 ```text
 marketplace.json                 Generated client-facing index.
-plugins/*.json                   Reviewed plugin entries.
+plugins/*.{yaml,yml,json}        Reviewed plugin entries maintained by humans.
 schemas/                         JSON Schemas for registry and manifest files.
 scripts/                         Validation and index-generation scripts.
 official-plugins/                Official plugin source directories.
+dist/                            Local release package output, not committed.
 ```
 
 ## Model
 
-Hana treats the marketplace as a discovery and trust index. The index points to a
-plugin source repository or a fixed release package. Installable release packages
-must include a SHA-256 checksum so the app can verify what it downloaded.
+Hana treats this repository as a discovery and trust index. The index points to a
+plugin repository and a fixed release package. Installable release packages must
+include a SHA-256 checksum so the app can verify what it downloaded.
 
 The first version supports two distribution modes:
 
-- `source`: source is kept in this repository. This is used for official examples
-  and plugins that are copied or packaged by maintainers.
-- `release`: the entry points at a versioned package URL and a checksum. This is
-  the mode Hana should use for one-click installation.
+- `release`: the entry points at a versioned package URL and checksum. This is
+  the normal one-click install mode.
+- `source`: local development and maintainer testing only. URL clients cannot
+  install source paths because remote repository paths are not local directories.
 
 ## Official Plugins
 
-Official plugins live in `official-plugins/` when they exist. The first public
-version of this repository starts with an empty catalog and keeps the directory
-only as a reserved home for future official plugins.
+Officially maintained plugin sources live in `official-plugins/`. The first
+catalog entry is `hanako-hyperframes`, which is maintained in this repository and
+published as a release zip.
 
 ## Developing With Hana
 
@@ -48,42 +50,42 @@ HANA_PLUGIN_MARKETPLACE_FILE=/path/to/OH-Plugins/marketplace.json npm run dev
 ```
 
 Local file marketplaces can install `distribution.kind = "source"` entries
-because paths resolve on disk. A URL marketplace can list plugins and show
-README content; remote release package download and checksum installation are a
-future Hana app capability.
+because paths resolve on disk. Normal client installs use
+`distribution.kind = "release"` from the official URL marketplace.
 
 ## Adding A Plugin
 
-1. Add `plugins/<plugin-id>.json`.
+1. Add `plugins/<plugin-id>.yaml`.
 2. Include the plugin source repository, manifest URL, version, trust level,
    compatibility, permissions, contributions, and distribution details.
    Add one README source so Hana can show the plugin detail page:
    `readme` for short inline Markdown, `readmeUrl` for HTTPS Markdown, or
-   `readmePath` when testing from a local marketplace file.
+   `readmePath` for Markdown stored in this repository.
 3. Run `npm run check`.
 4. Open a pull request.
 
 Runtime-installable community plugins should use `distribution.kind = "release"`
 with a fixed `packageUrl` and `sha256`.
 
-Official source plugins can live in `official-plugins/<plugin-id>/` with:
+Official source plugins can live in `official-plugins/<plugin-id>/` and publish
+a release package with:
 
-```json
-{
-  "distribution": { "kind": "source", "path": "official-plugins/<plugin-id>" },
-  "readme": "# Plugin Name\n\nShort Markdown description."
-}
+```yaml
+distribution:
+  kind: release
+  packageUrl: https://github.com/liliMozi/OH-Plugins/releases/download/<tag>/<plugin-id>.zip
+  sha256: <64 lowercase hex characters>
 ```
 
-Use `readmePath` for local `HANA_PLUGIN_MARKETPLACE_FILE` testing. Use `readme`
-or `readmeUrl` for `HANA_PLUGIN_MARKETPLACE_URL`.
+The generated `marketplace.json` is the only file Hana clients read.
 
 ## Local Commands
 
 ```bash
 npm run build:index
+npm run package:hanako-hyperframes
 npm run validate
 npm run check
 ```
 
-The scripts use only Node.js built-ins. No install step is required.
+Run `npm install` once after cloning this repository.

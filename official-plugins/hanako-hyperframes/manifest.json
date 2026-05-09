@@ -2,8 +2,8 @@
   "manifestVersion": 1,
   "id": "hanako-hyperframes",
   "name": "HyperFrames Adapter for Hanako",
-  "version": "0.1.1",
-  "description": "A Hanako-styled HyperFrames video workspace with preview, timeline, lint, and render tools.",
+  "version": "0.2.0",
+  "description": "Embed and Hana-theme the original HyperFrames Studio with project lifecycle, lint, and render tools.",
   "minAppVersion": "0.171.3",
   "trust": "full-access",
   "ui": {
@@ -12,8 +12,8 @@
   "contributes": {
     "page": {
       "title": {
-        "zh": "影帧",
-        "en": "Frames"
+        "zh": "HyperFrames",
+        "en": "HyperFrames"
       },
       "route": "/studio",
       "icon": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"1\"/><path d=\"M7 5v14M17 5v14M3 9h4M17 9h4M3 15h4M17 15h4\"/></svg>"

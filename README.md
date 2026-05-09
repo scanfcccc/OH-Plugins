@@ -33,19 +33,50 @@ Official plugins live in `official-plugins/` when they exist. The first public
 version of this repository starts with an empty catalog and keeps the directory
 only as a reserved home for future official plugins.
 
+## Developing With Hana
+
+Use the Hana app repo docs for plugin code:
+
+- `project-hana/.docs/PLUGIN-DEVELOPMENT.md`: end-to-end workflow.
+- `project-hana/PLUGINS.md`: plugin API and contribution reference.
+- `project-hana/PLUGIN_SDK.md`: SDK package map.
+
+For local marketplace testing, point Hana at this repository's generated index:
+
+```bash
+HANA_PLUGIN_MARKETPLACE_FILE=/path/to/OH-Plugins/marketplace.json npm run dev
+```
+
+Local file marketplaces can install `distribution.kind = "source"` entries
+because paths resolve on disk. A URL marketplace can list plugins and show
+README content; remote release package download and checksum installation are a
+future Hana app capability.
+
 ## Adding A Plugin
 
 1. Add `plugins/<plugin-id>.json`.
 2. Include the plugin source repository, manifest URL, version, trust level,
    compatibility, permissions, contributions, and distribution details.
    Add one README source so Hana can show the plugin detail page:
-   `readmePath` for files in this repository, `readmeUrl` for external Markdown,
-   or `readme` for a short inline Markdown description.
+   `readme` for short inline Markdown, `readmeUrl` for HTTPS Markdown, or
+   `readmePath` when testing from a local marketplace file.
 3. Run `npm run check`.
 4. Open a pull request.
 
 Runtime-installable community plugins should use `distribution.kind = "release"`
 with a fixed `packageUrl` and `sha256`.
+
+Official source plugins can live in `official-plugins/<plugin-id>/` with:
+
+```json
+{
+  "distribution": { "kind": "source", "path": "official-plugins/<plugin-id>" },
+  "readme": "# Plugin Name\n\nShort Markdown description."
+}
+```
+
+Use `readmePath` for local `HANA_PLUGIN_MARKETPLACE_FILE` testing. Use `readme`
+or `readmeUrl` for `HANA_PLUGIN_MARKETPLACE_URL`.
 
 ## Local Commands
 

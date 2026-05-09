@@ -1,7 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { buildStudioProxyUrl } from "../lib/studio-proxy.js";
+
+let studioProxyRouteImportCounter = 0;
 
 export default function registerApiRoutes(app, ctx) {
+  registerStudioProxyRoutesFromApi(app, ctx);
+
   app.get("/api/diagnostics", async (c) => {
     const runtime = requireRuntime(ctx);
     const runner = await runtime.getRunner();
@@ -10,7 +15,7 @@ export default function registerApiRoutes(app, ctx) {
       ...diagnostics,
       dataDir: ctx.dataDir,
       projects: runtime.projects.listProjects().length,
-      previews: (await runtime.getPreviewManager()).list(),
+      previews: (await runtime.getPreviewManager()).list().map((preview) => withStudioUrls(preview, c, ctx)),
     });
   });
 
@@ -35,7 +40,7 @@ export default function registerApiRoutes(app, ctx) {
     const runtime = requireRuntime(ctx);
     const project = runtime.projects.getProject(c.req.param("projectId"));
     const preview = await (await runtime.getPreviewManager()).start(project);
-    return c.json({ preview });
+    return c.json({ preview: withStudioUrls(preview, c, ctx) });
   });
 
   app.delete("/api/projects/:projectId/preview", async (c) => {
@@ -104,6 +109,33 @@ export default function registerApiRoutes(app, ctx) {
   });
 }
 
+function registerStudioProxyRoutesFromApi(app, ctx) {
+  const handler = async (c) => {
+    const { proxyStudioRequest } = await loadStudioProxyRouteModule();
+    return proxyStudioRequest(c, ctx);
+  };
+  registerMethod(app, "get", "/studio-proxy/:projectId", handler);
+  for (const method of ["get", "post", "put", "patch", "delete", "options", "head"]) {
+    registerMethod(app, method, "/studio-proxy/:projectId/*", handler);
+  }
+  registerMethod(app, "all", "/studio-proxy/:projectId/*", handler);
+}
+
+function registerMethod(app, method, route, handler) {
+  if (typeof app[method] === "function") {
+    app[method](route, handler);
+  }
+}
+
+let studioProxyRouteModulePromise = null;
+function loadStudioProxyRouteModule() {
+  if (!studioProxyRouteModulePromise) {
+    const cacheKey = `${Date.now()}-${studioProxyRouteImportCounter++}`;
+    studioProxyRouteModulePromise = import(`./studio-proxy.js?api=${cacheKey}`);
+  }
+  return studioProxyRouteModulePromise;
+}
+
 function requireRuntime(ctx) {
   if (!ctx._hyperframes) {
     throw new Error("HyperFrames plugin runtime is not initialized");
@@ -133,4 +165,23 @@ function safeName(value) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 48) || "video";
+}
+
+function withStudioUrls(preview, c, ctx) {
+  return decorateStudioPreviewUrls(preview, {
+    pluginId: ctx.pluginId,
+    token: c.req.query("token") || "",
+  });
+}
+
+export function decorateStudioPreviewUrls(preview, { pluginId, token }) {
+  return {
+    ...preview,
+    rawUrl: preview.url,
+    proxyUrl: buildStudioProxyUrl({
+      pluginId,
+      projectId: preview.projectId,
+      token,
+    }),
+  };
 }

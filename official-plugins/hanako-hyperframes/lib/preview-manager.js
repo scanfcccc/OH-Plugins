@@ -16,6 +16,11 @@ export class PreviewManager {
     return Array.from(this.sessions.values()).map(toPublicSession);
   }
 
+  get(projectId) {
+    const session = this.sessions.get(projectId);
+    return session ? toPublicSession(session) : null;
+  }
+
   async start(project) {
     const existing = this.sessions.get(project.id);
     if (existing && !existing.exited) {
@@ -73,6 +78,18 @@ export class PreviewManager {
     });
 
     this.sessions.set(project.id, session);
+    try {
+      await waitForPort(port, () => session.exited);
+      if (!session.exited) {
+        session.status = "running";
+      }
+    } catch (error) {
+      if (!session.exited) {
+        session.status = "failed";
+        session.error = error.message;
+        child.kill();
+      }
+    }
     return toPublicSession(session);
   }
 
@@ -120,5 +137,38 @@ function findFreePort() {
         }
       });
     });
+  });
+}
+
+function waitForPort(port, shouldStop, timeoutMs = 20000) {
+  const startedAt = Date.now();
+  return new Promise((resolve, reject) => {
+    const attempt = () => {
+      if (shouldStop()) {
+        reject(new Error("Preview exited before the Studio server was ready"));
+        return;
+      }
+      if (Date.now() - startedAt > timeoutMs) {
+        reject(new Error("Timed out waiting for the HyperFrames Studio server"));
+        return;
+      }
+
+      const socket = net.createConnection({ host: "127.0.0.1", port });
+      socket.setTimeout(1000);
+      socket.once("connect", () => {
+        socket.destroy();
+        resolve();
+      });
+      socket.once("timeout", () => {
+        socket.destroy();
+        setTimeout(attempt, 120);
+      });
+      socket.once("error", () => {
+        socket.destroy();
+        setTimeout(attempt, 120);
+      });
+    };
+
+    attempt();
   });
 }

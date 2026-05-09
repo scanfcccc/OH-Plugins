@@ -33,12 +33,14 @@ export type Diagnostics = {
   checks: Array<{ id: string; label: string; ok: boolean; detail: string }>;
   dataDir: string;
   projects: number;
-  previews: Array<{ projectId: string; url: string; status: string; error: string | null }>;
+  previews: Array<Preview>;
 };
 
 export type Preview = {
   projectId: string;
   url: string;
+  rawUrl?: string;
+  proxyUrl?: string;
   status: string;
   error: string | null;
 };

@@ -28,6 +28,18 @@ test("creates a project under plugin data with explicit project identity", async
   assert.deepEqual((await store.listProjects()).map((item) => item.id), ["launch-notes"]);
 });
 
+test("creates a HyperFrames-valid starter composition", async () => {
+  const { store } = await makeStore();
+
+  const project = await store.createProject({ title: "Playable" });
+  const html = await fs.readFile(path.join(project.root, "index.html"), "utf8");
+
+  assert.match(html, /data-composition-id="main"/);
+  assert.match(html, /window\.__timelines\["main"\]/);
+  assert.match(html, /gsap\.timeline\(\{ paused: true \}\)/);
+  assert.doesNotMatch(html, /\[data-composition-id="main"\]/);
+});
+
 test("creates unique ids without relying on global current project state", async () => {
   const { store } = await makeStore();
 

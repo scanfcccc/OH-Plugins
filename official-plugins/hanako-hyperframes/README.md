@@ -13,7 +13,7 @@ This plugin integrates with HyperFrames; it is not published by HeyGen.
 
 ## What It Adds
 
-- A full-screen page named `影帧` / `Frames`
+- A full-screen page named `HyperFrames`
 - Page UI i18n for Chinese and English, resolved from iframe locale query parameters or browser language
 - Project storage under the plugin data directory
 - Agent tools for creating, linting, and rendering projects

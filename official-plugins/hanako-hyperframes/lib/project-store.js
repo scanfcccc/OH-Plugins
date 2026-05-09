@@ -197,18 +197,32 @@ function demoIndexHtml(title) {
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=1920, height=1080">
   <title>${escapeHtml(title)}</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
   <style>
-    body { margin: 0; background: #f7f1e8; color: #2f2a24; font-family: Georgia, serif; }
-    [data-composition-id="main"] { position: relative; overflow: hidden; background: #f7f1e8; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #f7f1e8; }
+    body { color: #2f2a24; font-family: "Songti SC", Georgia, serif; }
+    #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #f7f1e8; }
+    #root::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.42;
+      background:
+        linear-gradient(rgba(47, 42, 36, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47, 42, 36, 0.045) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
     .scene { position: absolute; inset: 0; display: grid; place-items: center; padding: 120px; box-sizing: border-box; }
+    .scene > div { position: relative; z-index: 1; }
     .title { max-width: 1200px; font-size: 96px; line-height: 1.05; font-weight: 600; text-align: center; }
     .caption { margin-top: 28px; font-size: 32px; color: rgba(47, 42, 36, 0.66); text-align: center; }
   </style>
 </head>
 <body>
-  <div data-composition-id="main" data-start="0" data-duration="8" data-width="1920" data-height="1080">
+  <div id="root" data-composition-id="main" data-start="0" data-duration="8" data-width="1920" data-height="1080">
     <section id="intro" class="clip scene" data-start="0" data-duration="4" data-track-index="0">
       <div>
         <div class="title">${escapeHtml(title)}</div>
@@ -222,6 +236,19 @@ function demoIndexHtml(title) {
       </div>
     </section>
   </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    tl.from("#intro .title", { opacity: 0.12, y: 18, duration: 0.8, ease: "power2.out" }, 0);
+    tl.from("#intro .caption", { opacity: 0, y: 18, duration: 0.7, ease: "power2.out" }, 0.55);
+    tl.to("#intro", { opacity: 0, duration: 0.55, ease: "power1.inOut" }, 3.45);
+    tl.set("#intro", { opacity: 0 }, 4.0);
+    tl.from("#outro .title", { opacity: 0, y: 24, duration: 0.8, ease: "power2.out" }, 4.2);
+    tl.from("#outro .caption", { opacity: 0, y: 18, duration: 0.7, ease: "power2.out" }, 4.55);
+    tl.to("#outro", { opacity: 0, duration: 0.6, ease: "power1.inOut" }, 7.35);
+    tl.set("#outro", { opacity: 0 }, 8.0);
+    window.__timelines["main"] = tl;
+  </script>
 </body>
 </html>
 `;

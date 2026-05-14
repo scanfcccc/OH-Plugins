@@ -17,6 +17,7 @@ This plugin integrates with HyperFrames; it is not published by HeyGen.
 - Page UI i18n for Chinese and English, resolved from iframe locale query parameters or browser language
 - Project storage under the plugin data directory
 - Agent tools for creating, linting, and rendering projects
+- Upstream HyperFrames skills bundled under `skills/`, including CLI, composition, media, registry, and animation workflows
 - Render outputs that can be attached to Hanako sessions through SessionFile
 
 ## License

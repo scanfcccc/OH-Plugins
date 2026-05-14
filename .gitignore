@@ -1,9 +1,61 @@
+# Dependencies and package caches
 node_modules/
-dist/
-*.tgz
-.DS_Store
-coverage/
+.npm/
+.pnpm-store/
+.yarn/
+.pi/
 
-# Internal planning and handoff notes
+# Build, release, and test output
+dist/
+coverage/
+test-results/
+*.tgz
+*.tsbuildinfo
+.cache/
+.vite/
+
+# Local agent, assistant, and private notes
+AGENTS.md
+CLAUDE.md
 HANDOFF.md
+handoff-*.md
+TODO.md
+.docs/
 docs/superpowers/
+.superpowers/
+devlog/
+reviews/
+/.agents/
+/.codex/
+/.claude/
+/agents/
+/user/
+
+# Environment, credentials, and machine-local config
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.crt
+credentials.json
+secrets.yaml
+secrets.json
+auth.json
+*.code-workspace
+
+# Logs and temporary files
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+tmp/
+__pycache__/
+*.pyc
+
+# OS and local database files
+.DS_Store
+Thumbs.db
+*.db

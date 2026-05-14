@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import net from "node:net";
 import path from "node:path";
-import { parseCommandLine } from "./command-runner.js";
+import { createSpawnInvocation, parseCommandLine } from "./command-runner.js";
 
 export class PreviewManager {
   constructor({ command = "npx --yes hyperframes", env = {}, disableTelemetry = true, log = console } = {}) {
@@ -30,17 +30,17 @@ export class PreviewManager {
 
     const port = await findFreePort();
     const [file, ...baseArgs] = parseCommandLine(this.command);
+    if (!file) throw new Error("HyperFrames command is empty");
     const args = [...baseArgs, "preview", project.root, "--port", String(port)];
-    const child = spawn(file, args, {
+    const invocation = createSpawnInvocation(file, args, {
       cwd: project.root,
       env: {
         ...process.env,
         ...this.env,
         ...(this.disableTelemetry ? { HYPERFRAMES_NO_TELEMETRY: "1" } : {}),
       },
-      shell: false,
-      windowsHide: true,
     });
+    const child = spawn(invocation.file, invocation.args, invocation.options);
 
     const session = {
       projectId: project.id,

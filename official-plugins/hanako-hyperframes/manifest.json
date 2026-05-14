@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "hanako-hyperframes",
   "name": "HyperFrames Adapter for Hanako",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Embed and Hana-theme the original HyperFrames Studio with project lifecycle, lint, and render tools.",
   "minAppVersion": "0.171.3",
   "trust": "full-access",

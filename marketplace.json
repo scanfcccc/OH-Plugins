@@ -7,7 +7,7 @@
       "name": "HyperFrames Adapter for Hanako",
       "publisher": "OpenHanako",
       "author": "liliMozi",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "description": "Embed and Hana-theme the original HyperFrames Studio with project lifecycle, lint, and render tools.",
       "license": "Apache-2.0",
       "categories": [
@@ -39,6 +39,7 @@
       ],
       "contributions": [
         "tools",
+        "skills",
         "configuration",
         "routes",
         "page",
@@ -46,8 +47,8 @@
       ],
       "distribution": {
         "kind": "release",
-        "packageUrl": "https://github.com/liliMozi/OH-Plugins/releases/download/hanako-hyperframes-v0.2.0/hanako-hyperframes.zip",
-        "sha256": "51e386f4f46b5e6d6adc390eab3fda6aa78cce0a245ce4844440a761158b71f8"
+        "packageUrl": "https://github.com/liliMozi/OH-Plugins/releases/download/hanako-hyperframes-v0.3.0/hanako-hyperframes.zip",
+        "sha256": "0d72e16ac8794f13e5c04c2184140c642ea7bfa2f9e985f74350ec2698394819"
       },
       "install": {
         "defaultEnabled": false
